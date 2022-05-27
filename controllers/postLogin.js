@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
-const JWT = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 // Login 기능
 // model folder/User.js(usertable)에 접근해서 User 정보 가져온 후 비밀번호 검증 : bcrpy(req.body.password) == user.password
@@ -16,11 +16,21 @@ const postLogin = async (req, res) => {
     //   }
     if (user && (await bcrypt.compare(password, user.password))) {
       //db.user && req.body.password == db.user.password
-      console.log('user', user);
-      console.log('password', password);
-      console.log('user.password', user.password);
+      //   console.log('user', user);
+      //   console.log('password', password);
+      //   console.log('user.password', user.password);
       //send new token
-      const token = 'JWT_TOKEN';
+      // _id => mongodb / user/_id column : objectid("values like:asdfa14123")
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          mail,
+        },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: '24h',
+        }
+      );
       return res.status(200).json({
         userDetails: {
           mail: user.mail,
